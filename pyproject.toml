@@ -1,5 +1,5 @@
 [project]
-name = "tinderpet"
+name = "paky"
 version = "0.1.0"
 description = "Add your description here"
 requires-python = ">=3.12"
@@ -13,6 +13,7 @@ dependencies = [
     "django-environ>=0.11.2",
     "django-debug-toolbar>=4.4.6",
     "celery>=5.4.0",
+    "redis>=5.2.0",
 ]
 
 [dependency-groups]
