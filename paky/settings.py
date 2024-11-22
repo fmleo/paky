@@ -166,3 +166,11 @@ CELERY_TIMEZONE = TIME_ZONE
 
 WUZAPI_URL = env("WUZAPI_URL")
 WUZAPI_TOKEN = env("WUZAPI_TOKEN")
+
+# Jazzmin settings
+
+JAZZMIN_SETTINGS = {
+    "site_title": "Pakydermes Tarefas",
+    "site_header": "Pakydermes Tarefas",
+    "site_logo": "logo_sm.png",
+}
