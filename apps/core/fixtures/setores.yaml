@@ -1,0 +1,47 @@
+- model: core.setor
+  pk: 1
+  fields:
+    nome: "Artística"
+    emoji: "🎨"
+
+- model: core.setor
+  pk: 2
+  fields:
+    nome: "Charadas"
+    emoji: "🧩"
+
+- model: core.setor
+  pk: 3
+  fields:
+    nome: "Diversas"
+    emoji: "🪪"
+
+- model: core.setor
+  pk: 4
+  fields:
+    nome: "Especiais"
+    emoji: "✨"
+
+- model: core.setor
+  pk: 5
+  fields:
+    nome: "Esportivas"
+    emoji: "🏀"
+
+- model: core.setor
+  pk: 6
+  fields:
+    nome: "Mídias"
+    emoji: "🎬"
+
+- model: core.setor
+  pk: 7
+  fields:
+    nome: "Objetos"
+    emoji: "📦"
+
+- model: core.setor
+  pk: 8
+  fields:
+    nome: "Rua"
+    emoji: "🚗"
