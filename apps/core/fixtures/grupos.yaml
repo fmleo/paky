@@ -1,17 +1,40 @@
 - model: auth.group
-  pk: 1
   fields:
     name: Organizadora
     permissions:
-      - 37
-      - 38
-      - 39
-      - 40
-      - 41
-      - 42
-      - 43
-      - 44
-      - 33
-      - 34
-      - 35
-      - 36
+    - - add_gincana
+      - core
+      - gincana
+    - - change_gincana
+      - core
+      - gincana
+    - - delete_gincana
+      - core
+      - gincana
+    - - view_gincana
+      - core
+      - gincana
+    - - add_setor
+      - core
+      - setor
+    - - change_setor
+      - core
+      - setor
+    - - delete_setor
+      - core
+      - setor
+    - - view_setor
+      - core
+      - setor
+    - - add_tarefa
+      - core
+      - tarefa
+    - - change_tarefa
+      - core
+      - tarefa
+    - - delete_tarefa
+      - core
+      - tarefa
+    - - view_tarefa
+      - core
+      - tarefa
