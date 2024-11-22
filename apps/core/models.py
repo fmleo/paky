@@ -7,6 +7,7 @@ from django.core.validators import FileExtensionValidator
 from django.db import models
 from django.utils import timezone
 from django.utils.text import slugify
+from django.utils.timezone import localtime
 
 from paky.celery import app
 
@@ -48,9 +49,10 @@ class Tarefa(models.Model):
             return base64.b64encode(f.read()).decode('utf-8')
 
     def pretty_caption(self) -> str:
+        local_time = localtime(self.disponivel_em)
         return f"""{self.titulo}
 {self.setor}
-{timezone.make_aware(self.disponivel_em):%d/%m/%Y %R}"""
+{local_time:%d/%m/%Y %R}"""
 
     def __str__(self):
         return self.titulo
