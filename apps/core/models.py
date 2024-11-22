@@ -50,7 +50,7 @@ class Tarefa(models.Model):
     def pretty_caption(self) -> str:
         return f"""{self.titulo}
 {self.setor}
-{self.disponivel_em:%d/%m/%Y %R}"""
+{timezone.make_aware(self.disponivel_em):%d/%m/%Y %R}"""
 
     def __str__(self):
         return self.titulo
