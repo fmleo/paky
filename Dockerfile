@@ -21,4 +21,4 @@ RUN python manage.py migrate
 
 RUN python manage.py loaddata grupos setores
 
-EXPOSE 8000
+EXPOSE ${PORT}
