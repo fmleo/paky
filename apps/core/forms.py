@@ -2,18 +2,21 @@ import requests
 from django import forms
 from django.conf import settings
 
-from apps.core.models import Tarefa
+from apps.core.models import Gincana
 
 
-class TarefaForm(forms.ModelForm):
+class GincanaForm(forms.ModelForm):
     class Meta:
-        model = Tarefa
+        model = Gincana
         fields = "__all__"
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        response = requests.get(settings.WUZAPI_URL + "/group/list",
-                                headers={"token": settings.WUZAPI_TOKEN})
+
+        response = requests.get(
+            settings.WUZAPI_URL + "/group/list",
+            headers={"token": settings.WUZAPI_TOKEN},
+        )
 
         if response.status_code == 200:
             groups = []
