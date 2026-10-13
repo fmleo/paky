@@ -8,6 +8,7 @@ services:
     command: gunicorn --bind :${PORT:-8000} --workers 2 paky.wsgi
     volumes:
       - .:/code
+      - /code/.venv
     ports:
       - "${PORT:-8000}:${PORT:-8000}"
     depends_on:
@@ -25,5 +26,6 @@ services:
     command: celery -A paky worker --loglevel=info
     volumes:
       - .:/code
+      - /code/.venv
     depends_on:
       - valkey
