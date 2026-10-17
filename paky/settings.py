@@ -161,6 +161,12 @@ else:
 # Celery settings
 CELERY_BROKER_URL = env("CELERY_BROKER_URL")
 CELERY_TIMEZONE = TIME_ZONE
+# Keep unacknowledged tasks hidden longer than the HTTP request timeout.
+CELERY_BROKER_TRANSPORT_OPTIONS = {
+    "visibility_timeout": 300,
+}
+CELERY_TASK_ACKS_LATE = True
+CELERY_TASK_REJECT_ON_WORKER_LOST = True
 
 # Wuzapi settings
 

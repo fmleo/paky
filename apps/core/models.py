@@ -43,6 +43,8 @@ class Tarefa(models.Model):
     setor = models.ForeignKey('Setor', on_delete=models.SET_NULL, null=True)
     disponivel_em = models.DateTimeField()
     responsavel = models.ForeignKey('auth.User', on_delete=models.SET_NULL, null=True)
+    celery_task_id = models.CharField(max_length=255, null=True, editable=False)
+    sent_at = models.DateTimeField(null=True, editable=False)
 
     def arquivo_base64(self):
         with self.arquivo.open('rb') as f:
@@ -58,27 +60,58 @@ class Tarefa(models.Model):
         return self.titulo
 
     def save(self, *args, **kwargs):
+        is_new = self._state.adding
+        previous_disponivel_em = None
+        if not is_new:
+            previous_disponivel_em = type(self).objects.values_list(
+                'disponivel_em', flat=True
+            ).get(pk=self.pk)
+
         self.arquivo.name = f'{slugify(self.gincana.nome)}/{self.id}.pdf'
 
-        super(Tarefa, self).save(*args, **kwargs)
+        super().save(*args, **kwargs)
 
-        if self.disponivel_em > timezone.now():
+        disponivel_em_changed = previous_disponivel_em != self.disponivel_em
+        if (
+            (is_new or disponivel_em_changed)
+            and self.disponivel_em > timezone.now()
+            and self.sent_at is None
+        ):
             task = send_whatsapp_message.apply_async(args=[self.id], eta=self.disponivel_em)
+            type(self).objects.filter(pk=self.pk, celery_task_id__isnull=True).update(
+                celery_task_id=task.id
+            )
+            self.celery_task_id = task.id
 
 
 @app.task
-def send_whatsapp_message(tarefa_id: uuid.uuid4):
-    tarefa = Tarefa.objects.get(id=tarefa_id)
+def send_whatsapp_message(tarefa_id: uuid.UUID):
+    from django.db import transaction
 
-    data = {
-        "Phone": tarefa.gincana.grupo_whatsapp,
-        "Filename": f"{slugify(tarefa.titulo)}.pdf",
-        "Document": f"data:application/octet-stream;base64,{tarefa.arquivo_base64()}",
-        "Caption": tarefa.pretty_caption()
-    }
+    with transaction.atomic():
+        tarefa = Tarefa.objects.select_for_update().get(id=tarefa_id)
+        if tarefa.sent_at is not None:
+            return
+        data = {
+            "Phone": tarefa.gincana.grupo_whatsapp,
+            "Filename": f"{slugify(tarefa.titulo)}.pdf",
+            "Document": f"data:application/octet-stream;base64,{tarefa.arquivo_base64()}",
+            "Caption": tarefa.pretty_caption()
+        }
 
     headers = {"token": settings.WUZAPI_TOKEN}
 
-    resp = requests.post(settings.WUZAPI_URL + "/chat/send/document", json=data, headers=headers)
+    resp = requests.post(
+        settings.WUZAPI_URL + "/chat/send/document",
+        json=data,
+        headers=headers,
+        timeout=(10, 120),
+    )
+    resp.raise_for_status()
 
-    print(resp.content)
+    with transaction.atomic():
+        tarefa = Tarefa.objects.select_for_update().get(id=tarefa_id)
+        if tarefa.sent_at is None:
+            tarefa.sent_at = timezone.now()
+            tarefa.save(update_fields=["sent_at"])
+            print(resp.content)
