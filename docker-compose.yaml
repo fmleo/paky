@@ -29,3 +29,17 @@ services:
       - /code/.venv
     depends_on:
       - valkey
+  flower:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file:
+      - .env.prod
+    command: celery -A paky flower --port=5555
+    volumes:
+      - .:/code
+      - /code/.venv
+    ports:
+      - "127.0.0.1:5555:5555"
+    depends_on:
+      - valkey
